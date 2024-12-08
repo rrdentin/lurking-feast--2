@@ -21,19 +21,28 @@ class App {
     });
   }
 
-  async renderPage() {
-    console.log('Rendering page:', window.location.hash.slice(1));
-console.log('Matched route key:', Object.keys(routes).find(key => window.location.hash.slice(1).match(new RegExp(`^${key.replace(/:\w+/, '\\w+')}$`))));
-console.log('Matched page:', routes[window.location.hash.slice(1)] || 'NotFound');
-    let page = routes[window.location.hash.slice(1) || "/"];
-    
-    if (!page){
-        page = NotFoundPage
+    async renderPage() {
+        const url = window.location.hash.slice(1).toLowerCase() || '/';
+        let matchedRoute = null;
+        let params = {};
+
+        Object.keys(routes).forEach(route => {
+            const routePattern = new RegExp(`^${route.replace(/:\w+/g, '(\\w+)')}$`);
+            const match = url.match(routePattern);
+            if (match) {
+                matchedRoute = route;
+                const keys = route.match(/:(\w+)/g) || [];
+                keys.forEach((key, index) => {
+                    params[key.substring(1)] = match[index + 1];
+                });
+            }
+        });
+
+        let page = routes[matchedRoute] || NotFoundPage;
+
+        this._content.innerHTML = await page.render(params);
+        await page.afterRender(params);
     }
-    this._content.innerHTML = await page.render();
-    await page.afterRender();
-    
-  } 
 }
 
 export default App;

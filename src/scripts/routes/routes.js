@@ -8,7 +8,7 @@ const routes = {
   "/": new RestaurantPage(),
   "/top-rate": new TopRateRestaurantPage(),
   "/contact-us": new ContactUsPage(),
-  '/detail/:id': RestaurantDetailPage, // Corrected path for detail page with dynamic segment
+  '/detail/:id': new RestaurantDetailPage(), // Corrected path for detail page with dynamic segment
 };
 
 export default routes;
